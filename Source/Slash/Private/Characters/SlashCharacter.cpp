@@ -1,0 +1,96 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Characters/SlashCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
+// Sets default values
+ASlashCharacter::ASlashCharacter()
+{
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 200.f, 0.f); //400.f
+
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 200.f;
+
+	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
+	ViewCamera->SetupAttachment(CameraBoom);
+
+	//CameraBoom->bUsePawnControlRotation = true;   // Let controller affect boom
+	//ViewCamera->bUsePawnControlRotation = false;  // Don't let controller directly rotate camera
+
+	bUseControllerRotationYaw = true;
+	CameraBoom->bUsePawnControlRotation = true;
+	ViewCamera->bUsePawnControlRotation = false;
+}
+
+// Called when the game starts or when spawned
+void ASlashCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+// Called every frame
+void ASlashCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+void ASlashCharacter::MoveForward(float Value)
+{
+	if (Controller && Value != 0.f)
+	{
+		//FVector Forward = GetActorForwardVector();
+		//AddMovementInput(Forward, Value);
+
+		const FRotator ControlRotation = GetControlRotation();
+		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
+	}
+}
+void ASlashCharacter::MoveRight(float Value)
+{
+	if (Controller && Value != 0.f)
+	{
+		//FVector Right = GetActorRightVector();
+		//AddMovementInput(Right, Value);
+
+		const FRotator ControlRotation = GetControlRotation();
+		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		AddMovementInput(Direction, Value);
+	}
+}
+void ASlashCharacter::Turn(float Value)
+{
+	AddControllerYawInput(Value);
+}
+void ASlashCharacter::LookUp(float Value)
+{
+	AddControllerPitchInput(Value);
+}
+// Called to bind functionality to input
+void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis(FName("MoveForward"), this, &ASlashCharacter::MoveForward);
+	PlayerInputComponent->BindAxis(FName("MoveRight"), this, &ASlashCharacter::MoveRight);
+	PlayerInputComponent->BindAxis(FName("Turn"), this, &ASlashCharacter::Turn);
+	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ASlashCharacter::LookUp);
+}
+
