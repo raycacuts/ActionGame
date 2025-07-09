@@ -4,7 +4,7 @@
 #include "Items/Item.h"
 //#include "DrawDebugHelpers.h"
 #include "Slash/DebugMacros.h"
-
+#include "Components/SphereComponent.h"
 
 
 
@@ -17,13 +17,16 @@ AItem::AItem()
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
 	RootComponent = ItemMesh;
 
-
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	Sphere->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
 
 	//int32 avgInt = Avg<int32>(5, 10);
 	//UE_LOG(LogTemp, Warning, TEXT("Avg of 5 and 10: %d"), avgInt);
@@ -62,12 +65,13 @@ void AItem::Tick(float DeltaTime)
 
 	RunningTime += DeltaTime;
 
+	/**
 	float DeltaZ = TransformedSin(RunningTime);
 	AddActorWorldOffset(FVector(0.f, 0.f, DeltaZ));
 
 	DRAW_SPHERE_SingleFrame(GetActorLocation());
 	DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100.f);
-
+	**/
 	//FVector avgVector = Avg<FVector>(GetActorLocation(), FVector::ZeroVector);
 	//DRAW_POINT_SingleFrame(avgVector);
 
@@ -87,6 +91,13 @@ inline T AItem::Avg(T first, T second)
 {
 	return (first + second) / 2;
 }
-
+void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	const FString OtherActorName = OtherActor->GetName();
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Cyan, OtherActorName);
+	}
+}
 
 

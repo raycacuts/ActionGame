@@ -55,11 +55,11 @@ void ASlashCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector Velocity = GetVelocity();
+	/*FVector Velocity = GetVelocity();
 	FString Message = FString::Printf(TEXT("Character velocity: %f, %f, %f"), Velocity[0], Velocity[1], Velocity[2]);
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, Message);
-	}
+	}*/
 
 }
 void ASlashCharacter::MoveForward(float Value)
