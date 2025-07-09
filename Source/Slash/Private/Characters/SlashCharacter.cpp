@@ -6,6 +6,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
+#include "Slash/DebugMacros.h"
+#include "Items/Item.h"
+#include "Items/Weapons/Weapon.h"
 
 // Sets default values
 ASlashCharacter::ASlashCharacter()
@@ -60,7 +63,7 @@ void ASlashCharacter::Tick(float DeltaTime)
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, Message);
 	}*/
-
+	//DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100.f);
 }
 void ASlashCharacter::MoveForward(float Value)
 {
@@ -98,6 +101,16 @@ void ASlashCharacter::LookUp(float Value)
 {
 	AddControllerPitchInput(Value);
 }
+void ASlashCharacter::EKeyPressed()
+{
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingItem)
+	{
+		OverlappingWeapon->Equip(GetMesh(), "RightHandSocket");
+		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+	}
+
+}
 // Called to bind functionality to input
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -109,5 +122,6 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ASlashCharacter::LookUp);
 
 	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction(FName("Equip"), IE_Pressed, this, &ASlashCharacter::EKeyPressed);
 }
 
