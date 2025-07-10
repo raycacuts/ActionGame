@@ -108,5 +108,24 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		SlashCharacter->SetOverlappingItem(nullptr);
 	}
 }
+void AItem::SetCollisionForEquipped()
+{
+	if (ItemMesh)
+	{
+		ItemMesh->SetSimulatePhysics(false);
+		ItemMesh->SetEnableGravity(false);
+		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		ItemMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+		ItemMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
+		ItemMesh->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+		ItemMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // for attacking
+	}
+
+	if (Sphere)
+	{
+		// disable overlap detection once equipped
+		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
 
 

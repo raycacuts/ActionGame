@@ -17,8 +17,10 @@ void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
 	ItemMesh->SetSimulatePhysics(false);
 	ItemMesh->SetEnableGravity(false);
 	ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // Just overlap, no block
-	ItemMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	ItemMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // Optional
+	//ItemMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	ItemMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore); // Optional
+	//Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	ItemState = EItemState::EIS_Equipped;
 

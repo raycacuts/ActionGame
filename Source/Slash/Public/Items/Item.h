@@ -25,6 +25,8 @@ public:
 	AItem();
 	virtual void Tick(float DeltaTime) override;
 
+	void SetCollisionForEquipped();
+
 protected:
 	EItemState ItemState = EItemState::EIS_Hovering;
 
@@ -51,7 +53,8 @@ protected:
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* Sphere;
 
 private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Sine Parameters")
@@ -59,8 +62,7 @@ private:
 
 	
 
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* Sphere;
+	
 };
 
 

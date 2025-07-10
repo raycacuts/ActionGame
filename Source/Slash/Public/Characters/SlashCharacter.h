@@ -12,7 +12,7 @@ class UCameraComponent;
 class UGroomComponent;
 class AItem;
 class UAnimMontage;
-
+class AWeapon;
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ACharacter
@@ -43,6 +43,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
 
+	void PlayEquipMontage(FName SectionName);
+	bool CanDisarm();
+	bool CanArm();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -70,6 +73,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* EquipMontage;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	AWeapon* EquippedWeapon;
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
