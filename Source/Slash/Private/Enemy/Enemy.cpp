@@ -4,6 +4,8 @@
 #include "Enemy/Enemy.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Slash/DebugMacros.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -40,3 +42,47 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
+{
+	const FVector Forward = GetActorForwardVector();
+	const FVector ImpactLowered(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
+	const FVector ToHit = ImpactLowered - GetActorLocation().GetSafeNormal();
+
+	const double CosTheta = FVector::DotProduct(Forward, ToHit);
+	double Theta = FMath::RadiansToDegrees(FMath::Acos(CosTheta));
+
+	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
+
+	if (CrossProduct.Z < 0) Theta *= -1.f;
+
+	FName Section("FromBack");
+
+	if (Theta >= -45.f && Theta < 45.f)
+	{
+		Section = FName("FromFront");
+	}
+	else if (Theta >= -135.f && Theta < -45.f)
+	{
+		Section = FName("FromLeft");
+	}
+	else if (Theta >= 45.f && Theta < 135.f)
+	{
+		Section = FName("FromRight");
+	}
+	PlayHitReactMontage(Section);
+}
+void AEnemy::GetHit(const FVector& ImpactPoint)
+{
+	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+	DirectionalHitReact(ImpactPoint);
+}
+
+void AEnemy::PlayHitReactMontage(const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && HitReactMontage)
+	{
+		AnimInstance->Montage_Play(HitReactMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
+	}
+}

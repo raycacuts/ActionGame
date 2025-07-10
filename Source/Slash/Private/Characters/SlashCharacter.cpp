@@ -72,6 +72,7 @@ void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collsion
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollsionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
 	}
 }
 
