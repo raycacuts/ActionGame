@@ -8,6 +8,13 @@
 
 class USphereComponent;
 
+enum class EItemState : uint8
+{
+	EIS_Hovering,
+	EIS_Equipped
+};
+
+
 UCLASS()
 class SLASH_API AItem : public AActor
 {
@@ -19,6 +26,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	EItemState ItemState = EItemState::EIS_Hovering;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -34,17 +43,15 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Sine Functions")
 	float TransformedSin(float Value);
 
-	UPROPERTY(BlueprintReadWrite, Category = "State")
-	bool bIsHeld = false;
-
-	template<typename T>
-	T Avg(T first, T second);
-
+	//UPROPERTY(BlueprintReadWrite, Category = "State")
+	//
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
 
 private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Sine Parameters")

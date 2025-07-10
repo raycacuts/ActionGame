@@ -19,6 +19,8 @@ AItem::AItem()
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(GetRootComponent());
+
+
 }
 
 // Called when the game starts or when spawned
@@ -67,12 +69,11 @@ void AItem::Tick(float DeltaTime)
 	RunningTime += DeltaTime;
 
 	
-	if (!bIsHeld)
+	if (ItemState == EItemState::EIS_Hovering)
 	{
-		float DeltaZ = TransformedSin(RunningTime);
-		AddActorWorldOffset(FVector(0.f, 0.f, DeltaZ));
+		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin(RunningTime)));
 	}
-
+	
 	//DRAW_SPHERE_SingleFrame(GetActorLocation());
 	//DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100.f);
 	
@@ -90,11 +91,7 @@ float AItem::TransformedSin(float Value)
 {
 	return Amplitude * FMath::Sin(Value * TimeConstant);
 }
-template<typename T>
-inline T AItem::Avg(T first, T second)
-{
-	return (first + second) / 2;
-}
+
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);

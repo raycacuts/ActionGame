@@ -19,17 +19,19 @@ void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
 	ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // Just overlap, no block
 	ItemMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	ItemMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // Optional
-	bIsHeld = true;
+
+	ItemState = EItemState::EIS_Equipped;
+
 }
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::OnSphereOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 	
-	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	/*ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
 	if (SlashCharacter)
 	{
 		
-	}
+	}*/
 }
 void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
