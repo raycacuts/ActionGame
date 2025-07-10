@@ -6,7 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
-
+#include "Components/BoxComponent.h"
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
@@ -66,9 +66,20 @@ void ASlashCharacter::Tick(float DeltaTime)
 	}*/
 	//DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100.f);
 }
+
+void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollsionEnabled)
+{
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	{
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollsionEnabled);
+	}
+}
+
+
+
 void ASlashCharacter::MoveForward(float Value)
 {
-	if (ActionState == EActionState::EAS_Attacking) return;
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	if (Controller && Value != 0.f)
 	{
 		//FVector Forward = GetActorForwardVector();
@@ -83,7 +94,7 @@ void ASlashCharacter::MoveForward(float Value)
 }
 void ASlashCharacter::MoveRight(float Value)
 {
-	if (ActionState == EActionState::EAS_Attacking) return;
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	if (Controller && Value != 0.f)
 	{
 		//FVector Right = GetActorRightVector();
@@ -98,7 +109,6 @@ void ASlashCharacter::MoveRight(float Value)
 }
 void ASlashCharacter::Turn(float Value)
 {
-	if (ActionState == EActionState::EAS_Attacking) return;
 	AddControllerYawInput(Value);
 }
 void ASlashCharacter::LookUp(float Value)
@@ -133,14 +143,33 @@ void ASlashCharacter::EKeyPressed()
 		{
 			PlayEquipMontage(FName("Unequip"));
 			CharacterState = ECharacterState::ECS_Unequipped;
+			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 		else if (CanArm())
 		{
-			PlayEquipMontage(FName("Unequip"));
+			PlayEquipMontage(FName("Equip"));
 			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
 		}
 	}
 
+}
+void ASlashCharacter::FinishEquipping()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+void ASlashCharacter::Disarm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("SpineSocket"));
+	}
+}
+void ASlashCharacter::Arm()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("RightHandSocket"));
+	}
 }
 void ASlashCharacter::PlayEquipMontage(FName SectionName)
 {

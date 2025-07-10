@@ -28,6 +28,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollsionEnabled);
+
+
 protected:
 	//Callbacks for inuput
 	void MoveForward(float Value);
@@ -46,6 +50,15 @@ protected:
 	void PlayEquipMontage(FName SectionName);
 	bool CanDisarm();
 	bool CanArm();
+
+	UFUNCTION(BlueprintCallable)
+	void Disarm();
+
+	UFUNCTION(BlueprintCallable)
+	void Arm();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishEquipping();
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
