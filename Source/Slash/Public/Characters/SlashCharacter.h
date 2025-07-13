@@ -34,6 +34,10 @@ public:
 	virtual void AddSouls(ASoul* Soul) override;
 	virtual void AddGold(ATreasure* Treasure) override;
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
+	float TempValue;
+
 	virtual void BeginPlay() override;
 
 	/** Callbacks for input	*/

@@ -31,11 +31,15 @@ void AWeapon::BeginPlay()
 
 	WeaponBox->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnBoxOverlap);
 }
-
+UBoxComponent* AWeapon::GetWeaponBox()
+{
+	return WeaponBox;
+}
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator)
 {
 	ItemState = EItemState::EIS_Equipped;
 	SetOwner(NewOwner);
+	if(GetOwner()->ActorHasTag(TEXT("Enemy"))) WeaponBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	SetInstigator(NewInstigator);
 	AttachMeshToSocket(InParent, InSocketName);
 	DisableSphereCollision();
@@ -96,7 +100,11 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 bool AWeapon::ActorIsSameType(AActor* OtherActor)
 {
-	return GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
+	if (GetOwner() && OtherActor)
+	{
+		return GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
+	}
+	return false;
 }
 
 void AWeapon::ExecuteGetHit(FHitResult& BoxHit)

@@ -18,33 +18,33 @@ public:
 	void RegenStamina(float DeltaTime);
 protected:
 	virtual void BeginPlay() override;
-
-private:
 	// Current Health
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
-	float Health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
+	float Health = 1000;
 
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
-	float MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
+	float MaxHealth = 1000;
 
 	// Current Stamina
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
 	float Stamina;
 
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
 	float MaxStamina;
 
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
 	int32 Gold;
 
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
 	int32 Souls;
 
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
 	float DodgeCost = 14.f;
 
-	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
 	float StaminaRegenRate = 8.f;
+private:
+	
 
 public:
 	void ReceiveDamage(float Damage);

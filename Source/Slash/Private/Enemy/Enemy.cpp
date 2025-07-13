@@ -346,6 +346,12 @@ void AEnemy::SpawnDefaultWeapon()
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
 		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
 		EquippedWeapon = DefaultWeapon;
+
+	/*	DefaultWeapon->GetWeaponBox()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		DefaultWeapon->GetWeaponBox()->SetCollisionObjectType(ECC_WorldDynamic);
+		DefaultWeapon->GetWeaponBox()->SetCollisionResponseToAllChannels(ECR_Ignore);
+		DefaultWeapon->GetWeaponBox()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);*/
+
 	}
 }
 

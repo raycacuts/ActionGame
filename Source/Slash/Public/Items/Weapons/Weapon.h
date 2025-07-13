@@ -25,6 +25,7 @@ public:
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 
 	TArray<AActor*> IgnoreActors;
+	UBoxComponent* GetWeaponBox();
 protected:
 	virtual void BeginPlay() override;
 
