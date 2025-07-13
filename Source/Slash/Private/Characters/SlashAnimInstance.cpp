@@ -16,6 +16,7 @@ void USlashAnimInstance::NativeInitializeAnimation()
 		SlashCharacterMovement = SlashCharacter->GetCharacterMovement();
 	}
 }
+
 void USlashAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
@@ -25,5 +26,7 @@ void USlashAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		GroundSpeed = UKismetMathLibrary::VSizeXY(SlashCharacterMovement->Velocity);
 		IsFalling = SlashCharacterMovement->IsFalling();
 		CharacterState = SlashCharacter->GetCharacterState();
+		ActionState = SlashCharacter->GetActionState();
+		DeathPose = SlashCharacter->GetDeathPose();
 	}
 }

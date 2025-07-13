@@ -2,130 +2,97 @@
 
 
 #include "Items/Item.h"
-//#include "DrawDebugHelpers.h"
 #include "Slash/DebugMacros.h"
 #include "Components/SphereComponent.h"
-#include "Characters/SlashCharacter.h"
+#include "Interfaces/PickupInterface.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
-
-// Sets default values
 AItem::AItem()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMeshComponent"));
+	ItemMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RootComponent = ItemMesh;
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(GetRootComponent());
 
-
+	ItemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
+	ItemEffect->SetupAttachment(GetRootComponent());
 }
 
-// Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
 	Sphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
-
-	//int32 avgInt = Avg<int32>(5, 10);
-	//UE_LOG(LogTemp, Warning, TEXT("Avg of 5 and 10: %d"), avgInt);
-
-	//float avgFloat = Avg<float>(5.5f, 10.5f);
-	//UE_LOG(LogTemp, Warning, TEXT("Avg of 5.5 and 10.5: %f"), avgFloat);
-
-	//UE_LOG(LogTemp, Warning, TEXT("Begin Play called!"));
-	//
-	//if (GEngine) {
-	//	GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Red, TEXT("Item OnScreen Message!"));
-	//}
-	//UWorld* World = GetWorld();
-	//SetActorLocation(FVector(0.f, 0.f, 200.f));
-	//SetActorRotation(FRotator(0.f, 90.f, 90.f));
-
-	//FVector Location = GetActorLocation();
-	//FVector Forward = GetActorForwardVector();
-	//if (World)
-	//{
-	//	
-	//	
-	//	DRAW_SPHERE(Location);
-	//	//DRAW_LINE(Location, Location + Forward * 100.f);
-	//	//DRAW_POINT(Location);
-	//	DRAW_VECTOR(Location, Location + Forward * 100.f);
-
-	//}
-
 }
 
-// Called every frame
-void AItem::Tick(float DeltaTime)
+float AItem::TransformedSin()
 {
-	Super::Tick(DeltaTime);
-
-	RunningTime += DeltaTime;
-
-	
-	if (ItemState == EItemState::EIS_Hovering)
-	{
-		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin(RunningTime)));
-	}
-	
-	//DRAW_SPHERE_SingleFrame(GetActorLocation());
-	//DRAW_VECTOR_SingleFrame(GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100.f);
-	
-	//FVector avgVector = Avg<FVector>(GetActorLocation(), FVector::ZeroVector);
-	//DRAW_POINT_SingleFrame(avgVector);
-
-	//FString Name = GetName();
-
-	//FString Message = FString::Printf(TEXT("Item Tick DeltaTime: %f, Item Name: %s"), DeltaTime, *Name);
-	//if (GEngine) {
-	//	GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, Message);
-	//}
+	return Amplitude * FMath::Sin(RunningTime * TimeConstant);
 }
-float AItem::TransformedSin(float Value)
+
+float AItem::TransformedCos()
 {
-	return Amplitude * FMath::Sin(Value * TimeConstant);
+	return Amplitude * FMath::Cos(RunningTime * TimeConstant);
 }
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
-	if (SlashCharacter)
+	IPickupInterface* PickupInterface = Cast<IPickupInterface>(OtherActor);
+	if (PickupInterface)
 	{
-		SlashCharacter->SetOverlappingItem(this);
+		PickupInterface->SetOverlappingItem(this);
 	}
 }
+
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
-	if (SlashCharacter)
+	IPickupInterface* PickupInterface = Cast<IPickupInterface>(OtherActor);
+	if (PickupInterface)
 	{
-		SlashCharacter->SetOverlappingItem(nullptr);
+		PickupInterface->SetOverlappingItem(nullptr);
 	}
 }
-void AItem::SetCollisionForEquipped()
+
+void AItem::SpawnPickupSystem()
 {
-	if (ItemMesh)
+	if (PickupEffect)
 	{
-		ItemMesh->SetSimulatePhysics(false);
-		ItemMesh->SetEnableGravity(false);
-		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		ItemMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-		ItemMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
-		ItemMesh->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-		ItemMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // for attacking
-	}
-
-	if (Sphere)
-	{
-		// disable overlap detection once equipped
-		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this,
+			PickupEffect,
+			GetActorLocation()
+		);
 	}
 }
 
+void AItem::SpawnPickupSound()
+{
+	if (PickupSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			PickupSound,
+			GetActorLocation()
+		);
+	}
+}
+
+void AItem::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	RunningTime += DeltaTime;
+
+	if (ItemState == EItemState::EIS_Hovering)
+	{
+		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
+	}
+}
 

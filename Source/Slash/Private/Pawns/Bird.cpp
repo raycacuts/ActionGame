@@ -7,15 +7,13 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
-// Sets default values
 ABird::ABird()
 {
-	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
-	Capsule->SetCapsuleHalfHeight(20.0f);
-	Capsule->SetCapsuleRadius(15.0f);
+	Capsule->SetCapsuleHalfHeight(20.f);
+	Capsule->SetCapsuleRadius(15.f);
 	SetRootComponent(Capsule);
 
 	BirdMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BirdMesh"));
@@ -23,45 +21,39 @@ ABird::ABird()
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetArmLength = 100.f;
+	CameraBoom->TargetArmLength = 300.f;
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(CameraBoom);
 
-	CameraBoom->bUsePawnControlRotation = true;   // Let controller affect boom
-	ViewCamera->bUsePawnControlRotation = false;  // Don't let controller directly rotate camera
-
-	bUseControllerRotationYaw = true;
-	CameraBoom->bUsePawnControlRotation = true;
-	ViewCamera->bUsePawnControlRotation = false;
-
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
-// Called when the game starts or when spawned
 void ABird::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 }
+
 void ABird::MoveForward(float Value)
 {
-
-	if (Controller && Value != 0.f)
+	if (Controller && (Value != 0.f))
 	{
-		FVector Forward = ViewCamera->GetForwardVector();
+		FVector Forward = GetActorForwardVector();
 		AddMovementInput(Forward, Value);
 	}
 }
+
 void ABird::Turn(float Value)
 {
 	AddControllerYawInput(Value);
 }
+
 void ABird::LookUp(float Value)
 {
 	AddControllerPitchInput(Value);
 }
-// Called every frame
+
 void ABird::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -77,5 +69,4 @@ void ABird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(FName("Turn"), this, &ABird::Turn);
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &ABird::LookUp);
 }
-
 

@@ -8,7 +8,6 @@
 #include "BreakableActor.generated.h"
 
 class UGeometryCollectionComponent;
-class UChaosGameplayEventDispatcherComponent;
 
 UCLASS()
 class SLASH_API ABreakableActor : public AActor, public IHitInterface
@@ -16,13 +15,12 @@ class SLASH_API ABreakableActor : public AActor, public IHitInterface
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ABreakableActor();
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -30,14 +28,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UCapsuleComponent* Capsule;
-private:	
-	
 
+private:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Breakable Properties")
 	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Chaos", meta = (AllowPrivateAccess = "true"))
-	//UChaosGameplayEventDispatcherComponent* GameplayEventDispatcher;
-
+	bool bBroken = false;
 };

@@ -7,12 +7,18 @@ public class Slash : ModuleRules
 	public Slash(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "GeometryCollectionEngine", "Chaos",                      // For Chaos types (like FChaosBreakEvent)
-    "ChaosSolverEngine", "FieldSystemEngine",
-    "PhysicsCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+        //PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HairStrandsCore", "GeometryCollectionEngine", "Chaos",                      // For Chaos types (like FChaosBreakEvent)
+        // "ChaosSolverEngine", "Niagara", "UMG", "AIModule"});
+        PublicDependencyModuleNames.AddRange(
+    new string[]
+    {
+        "Core", "CoreUObject", "Engine", "InputCore",
+        "UMG", "Slate", "SlateCore", "GameplayTasks",
+        "AIModule", "NavigationSystem", "Niagara",
+        "HairStrandsCore", "GeometryCollectionEngine"
+    });
+        PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

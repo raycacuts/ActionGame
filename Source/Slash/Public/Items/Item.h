@@ -7,6 +7,7 @@
 #include "Item.generated.h"
 
 class USphereComponent;
+class UNiagaraComponent;
 
 enum class EItemState : uint8
 {
@@ -14,55 +15,65 @@ enum class EItemState : uint8
 	EIS_Equipped
 };
 
-
 UCLASS()
 class SLASH_API AItem : public AActor
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this actor's properties
+	
+public:	
 	AItem();
 	virtual void Tick(float DeltaTime) override;
-
-	void SetCollisionForEquipped();
-
 protected:
-	EItemState ItemState = EItemState::EIS_Hovering;
-
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
-	float Amplitude = 0.2f;
+	float Amplitude = 0.25f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sine Parameters")
-	float TimeConstant = 2.f;
+	float TimeConstant = 5.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* ItemMesh;
+	UFUNCTION(BlueprintPure)
+	float TransformedSin();
 
-	UFUNCTION(BlueprintCallable, Category = "Sine Functions")
-	float TransformedSin(float Value);
+	UFUNCTION(BlueprintPure)
+	float TransformedCos();
 
-	//UPROPERTY(BlueprintReadWrite, Category = "State")
-	//
+	template<typename T>
+	T Avg(T First, T Second);
+
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	virtual void SpawnPickupSystem();
+	virtual void SpawnPickupSound();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* ItemMesh;
+
+	EItemState ItemState = EItemState::EIS_Hovering;
+
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* Sphere;
 
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* ItemEffect;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* PickupSound;
+
 private:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Sine Parameters")
-	float RunningTime = 0.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float RunningTime;
 
-	
-
-	
+	UPROPERTY(EditAnywhere)
+	class UNiagaraSystem* PickupEffect;
 };
 
-
+template<typename T>
+inline T AItem::Avg(T First, T Second)
+{
+	return (First + Second) / 2;
+}
