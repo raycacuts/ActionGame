@@ -102,6 +102,7 @@ void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 
+	//EquippedWeapon->ResetIgnoreActors();
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	if (Attributes && Attributes->GetHealthPercent() > 0.f)
 	{
@@ -214,7 +215,10 @@ void ASlashCharacter::Attack()
 
 void ASlashCharacter::Dodge()
 {
+
 	if (IsOccupied() || !HasEnoughStamina()) return;
+
+
 
 	PlayDodgeMontage();
 	ActionState = EActionState::EAS_Dodge;

@@ -35,6 +35,12 @@ UBoxComponent* AWeapon::GetWeaponBox()
 {
 	return WeaponBox;
 }
+void AWeapon::ResetIgnoreActors()
+{
+	IgnoreActors.Empty();
+	IgnoreActors.Add(this);
+	IgnoreActors.Add(GetOwner());
+}
 void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator)
 {
 	ItemState = EItemState::EIS_Equipped;
@@ -83,6 +89,22 @@ void AWeapon::AttachMeshToSocket(USceneComponent* InParent, const FName& InSocke
 
 void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!OtherActor || OtherActor == GetOwner()) return;
+	//if (ActorIsSameType(OtherActor)) return;
+
+	//FHitResult BoxHit;
+	//BoxTrace(BoxHit);
+
+	//AActor* HitActor = BoxHit.GetActor();
+	//if (HitActor && !ActorIsSameType(HitActor))
+	//{
+	//	if (IgnoreActors.Contains(HitActor)) return;
+
+	//	IgnoreActors.Add(HitActor);
+	//	UGameplayStatics::ApplyDamage(HitActor, Damage, GetInstigator()->GetController(), this, UDamageType::StaticClass());
+	//	ExecuteGetHit(BoxHit);
+	//	CreateFields(BoxHit.ImpactPoint);
+	//}
 	if (ActorIsSameType(OtherActor)) return;
 
 	FHitResult BoxHit;
@@ -100,11 +122,18 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 bool AWeapon::ActorIsSameType(AActor* OtherActor)
 {
-	if (GetOwner() && OtherActor)
-	{
-		return GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
-	}
-	return false;
+	if (!OtherActor || !GetOwner()) return true;
+
+	//// Prevent friendly fire for enemies and players
+	//bool bOwnerIsEnemy = GetOwner()->ActorHasTag(TEXT("Enemy"));
+	//bool bOtherIsEnemy = OtherActor->ActorHasTag(TEXT("Enemy"));
+	//bool bOwnerIsPlayer = GetOwner()->ActorHasTag(TEXT("Player"));
+	//bool bOtherIsPlayer = OtherActor->ActorHasTag(TEXT("Player"));
+
+	//return (bOwnerIsEnemy && bOtherIsEnemy) || (bOwnerIsPlayer && bOtherIsPlayer);
+	return GetOwner()->ActorHasTag(TEXT("Enemy")) && OtherActor->ActorHasTag(TEXT("Enemy"));
+	
+
 }
 
 void AWeapon::ExecuteGetHit(FHitResult& BoxHit)
