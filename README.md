@@ -1,1 +1,1 @@
-![Demo](ScreenShots/HighresScreenshot00000.png.png)
+![Demo](ScreenShots/HighresScreenshot00000.png)
