@@ -15,6 +15,8 @@
 #include "HUD/SlashOverlay.h"
 #include "Items/Soul.h"
 #include "Items/Treasure.h"
+#include "TimerManager.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ASlashCharacter::ASlashCharacter()
 {
@@ -55,7 +57,7 @@ ASlashCharacter::ASlashCharacter()
 	Eyebrows->SetupAttachment(GetMesh());
 	Eyebrows->AttachmentName = FString("head");
 
-
+	
 }
 
 void ASlashCharacter::Tick(float DeltaTime)
@@ -66,7 +68,11 @@ void ASlashCharacter::Tick(float DeltaTime)
 		SlashOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
 	}
 }
-
+void ASlashCharacter::QuitGame()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	UKismetSystemLibrary::QuitGame(this, PC, EQuitPreference::Quit, true);
+}
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -80,6 +86,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction(FName("Equip"), IE_Pressed, this, &ASlashCharacter::EKeyPressed);
 	PlayerInputComponent->BindAction(FName("Attack"), IE_Pressed, this, &ASlashCharacter::Attack);
 	PlayerInputComponent->BindAction(FName("Dodge"), IE_Pressed, this, &ASlashCharacter::Dodge);
+	PlayerInputComponent->BindAction("QuitGame", IE_Pressed, this, &ASlashCharacter::QuitGame);
 }
 
 void ASlashCharacter::Jump()
@@ -139,6 +146,22 @@ void ASlashCharacter::BeginPlay()
 	
 	Tags.Add(FName("EngageableTarget"));
 	InitializeSlashOverlay();
+
+	if (DefaultWeaponClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+
+		AWeapon* SpawnedWeapon = GetWorld()->SpawnActor<AWeapon>(DefaultWeaponClass, SpawnParams);
+		if (SpawnedWeapon)
+		{
+			EquipWeapon(SpawnedWeapon);
+			SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
+	InitialSpawnLocation = GetActorLocation();
+	InitialSpawnRotation = GetActorRotation();
+	//SlashOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
 }
 
 void ASlashCharacter::MoveForward(float Value)
@@ -314,7 +337,27 @@ void ASlashCharacter::Die_Implementation()
 
 	ActionState = EActionState::EAS_Dead;
 	DisableMeshCollision();
+
+	Destroy();
+	if(EquippedWeapon) EquippedWeapon->Destroy();
+	
+	if (SlashOverlay)
+	{
+		SlashOverlay->RemoveFromParent();
+		SlashOverlay = nullptr;
+	}
+	//// Disable input
+	//AController* PlayerController = GetController();
+	//if (PlayerController)
+	//{
+	//	DisableInput(Cast<APlayerController>(PlayerController));
+	//}
+
+	//// Respawn after delay
+	//FTimerHandle RespawnTimerHandle;
+	//GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ASlashCharacter::Respawn, 3.f, false);
 }
+
 
 bool ASlashCharacter::HasEnoughStamina()
 {
@@ -356,6 +399,7 @@ void ASlashCharacter::InitializeSlashOverlay()
 				SlashOverlay->SetStaminaBarPercent(1.f);
 				SlashOverlay->SetGold(0);
 				SlashOverlay->SetSouls(0);
+				SlashOverlay->AddToViewport();
 			}
 		}
 	}

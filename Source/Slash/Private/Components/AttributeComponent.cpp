@@ -29,7 +29,18 @@ float UAttributeComponent::GetHealthPercent()
 {
 	return Health / MaxHealth;
 }
-
+float UAttributeComponent::GetMaxHealth()
+{
+	return MaxHealth;
+}
+float UAttributeComponent::GetHealth()
+{
+	return Health;
+}
+void UAttributeComponent::SetFullHealth()
+{
+	Health = MaxHealth;
+}
 float UAttributeComponent::GetStaminaPercent()
 {
 	return Stamina / MaxStamina;

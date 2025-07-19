@@ -21,7 +21,14 @@ void ABaseCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
+float ABaseCharacter::GetHealth()
+{
+	return Attributes->GetHealth();
+}
+void ABaseCharacter::SetFullHealth()
+{
+	Attributes->SetFullHealth();
+}
 void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	if (IsAlive() && Hitter)

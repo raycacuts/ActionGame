@@ -16,6 +16,9 @@ public:
 	UAttributeComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void RegenStamina(float DeltaTime);
+	float GetMaxHealth();
+	float GetHealth();
+	void SetFullHealth();
 protected:
 	virtual void BeginPlay() override;
 	// Current Health

@@ -51,6 +51,12 @@ protected:
 	FVector GetTranslationWarpTarget();
 
 	UFUNCTION(BlueprintCallable)
+	float GetHealth();
+
+	UFUNCTION(BlueprintCallable)
+	void SetFullHealth();
+
+	UFUNCTION(BlueprintCallable)
 	FVector GetRotationWarpTarget();
 
 	UFUNCTION(BlueprintCallable)

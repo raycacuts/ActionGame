@@ -24,7 +24,7 @@ public:
 	void PlayEquipSound();
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 	void ResetIgnoreActors();
-
+	
 	TArray<AActor*> IgnoreActors;
 	UBoxComponent* GetWeaponBox();
 protected:

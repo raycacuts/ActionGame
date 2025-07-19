@@ -35,6 +35,11 @@ public:
 	virtual void AddGold(ATreasure* Treasure) override;
 protected:
 
+	FVector InitialSpawnLocation;
+	FRotator InitialSpawnRotation;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapons")
+	TSubclassOf<AWeapon> DefaultWeaponClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor Attributes", meta = (AllowPrivateAccess = "true"))
 	float TempValue;
 
@@ -80,11 +85,14 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
+	UFUNCTION(BlueprintCallable)
+	void InitializeSlashOverlay();
+
+
 private:
 	bool IsUnoccupied();
-	void InitializeSlashOverlay();
 	void SetHUDHealth();
-
+	void QuitGame();
 	/** Character components */
 
 	UPROPERTY(VisibleAnywhere)
